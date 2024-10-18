@@ -5,3 +5,4 @@ seaborn
 sqlalchemy
 folium
 streamlit-folium
+geopy
