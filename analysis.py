@@ -1,5 +1,69 @@
 import streamlit as st
 import pandas as pd
+import json
+from sqlalchemy import create_engine
+
+# Create a SQLite connection
+engine = create_engine('sqlite:///yelp.db')
+
+# Define a function to load the data from JSON to a DataFrame
+def load_json_to_dataframe(file):
+    data = [json.loads(line) for line in file]
+    return pd.DataFrame(data)
+
+# Load data into the SQLite database
+def load_data_to_db():
+    # Business Data
+    if uploaded_business_file is not None:
+        business_df = load_json_to_dataframe(uploaded_business_file)
+        business_df.drop(['attributes', 'hours'], axis=1, inplace=True, errors='ignore')
+        business_df.to_sql('business', con=engine, if_exists='replace', index=False)
+        st.success(f"Loaded {business_df.shape[0]} records into the 'business' table.")
+    
+    # Check-In Data
+    if uploaded_checkin_file is not None:
+        checkin_df = load_json_to_dataframe(uploaded_checkin_file)
+        checkin_df.to_sql('checkin', con=engine, if_exists='replace', index=False)
+        st.success(f"Loaded {checkin_df.shape[0]} records into the 'checkin' table.")
+    
+    # Review Data
+    if uploaded_review_file is not None:
+        review_df = load_json_to_dataframe(uploaded_review_file)
+        review_df.to_sql('review', con=engine, if_exists='replace', index=False)
+        st.success(f"Loaded {review_df.shape[0]} records into the 'review' table.")
+    
+    # Tip Data
+    if uploaded_tip_file is not None:
+        tip_df = load_json_to_dataframe(uploaded_tip_file)
+        tip_df.to_sql('tip', con=engine, if_exists='replace', index=False)
+        st.success(f"Loaded {tip_df.shape[0]} records into the 'tip' table.")
+    
+    # User Data
+    if uploaded_user_file is not None:
+        user_df = load_json_to_dataframe(uploaded_user_file)
+        user_df.to_sql('user', con=engine, if_exists='replace', index=False)
+        st.success(f"Loaded {user_df.shape[0]} records into the 'user' table.")
+
+# Title of the app
+st.title("Yelp Database Creation")
+
+# File uploader for JSON files
+uploaded_business_file = st.file_uploader("Upload business dataset JSON", type="json")
+uploaded_checkin_file = st.file_uploader("Upload check-in dataset JSON", type="json")
+uploaded_review_file = st.file_uploader("Upload review dataset JSON", type="json")
+uploaded_tip_file = st.file_uploader("Upload tip dataset JSON", type="json")
+uploaded_user_file = st.file_uploader("Upload user dataset JSON", type="json")
+
+# Load data to the database
+if st.button("Load Data"):
+    load_data_to_db()
+
+# Load and display business data
+if st.button("Display Business Data Sample"):
+    business_data = pd.read_sql_query("SELECT * FROM business LIMIT 5", engine)
+    st.dataframe(business_data)
+import streamlit as st
+import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import sqlite3
