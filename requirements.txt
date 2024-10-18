@@ -1,0 +1,7 @@
+streamlit
+pandas
+matplotlib
+seaborn
+sqlalchemy
+folium
+streamlit-folium
